@@ -1,15 +1,35 @@
 import { Button } from "@/components/ui/button/button";
+import UserCard from "@/components/user-card";
+import { useLazyGetUserQuery } from "@/services/user";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const Home: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const [getUsers, { isLoading, data: users }] = useLazyGetUserQuery();
 
-  const changeLanguage = async (lng: string): Promise<void> => {
+  useEffect(() => {
+    getUsers()
+      .then(() => {
+        console.log("Users fetched");
+      })
+      .catch(() => {
+        console.log("Error fetching users");
+      });
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const changeLanguage: (lng: string) => Promise<void> = async (
+    lng: string
+  ) => {
     await i18n.changeLanguage(lng);
   };
 
   return (
-    <div className="text-center h-screen flex flex-col items-center justify-center">
+    <main className="h-screen flex flex-col overflow-y-auto">
       <h1 className="mb-4 text-6xl font-semibold text-slate-600">
         {t("home.greeting")}
         <br />
@@ -29,7 +49,7 @@ const Home: React.FC = () => {
           ></path>
         </svg>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 w-1/2 mx-auto mb-4">
         <p className="mt-4 text-gray-600 ">Select language:</p>
         <Button onClick={() => changeLanguage("en")}>
           Change Language to English
@@ -38,7 +58,15 @@ const Home: React.FC = () => {
           Change Language to Spanish
         </Button>
       </div>
-    </div>
+      <div className="text-xl font-semibold text-slate-600 gap-2 mt-2 flex items-center justify-center">
+        Sample users(with api):
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
+        {users?.map((user) => (
+          <UserCard user={user} />
+        ))}
+      </div>
+    </main>
   );
 };
 
