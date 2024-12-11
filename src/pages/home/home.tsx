@@ -1,3 +1,4 @@
+import ToolsOverview from "@/components/tools-overview";
 import { Button } from "@/components/ui/button/button";
 import UserCard from "@/components/user-card";
 import { useLazyGetUserQuery } from "@/services/user";
@@ -29,14 +30,14 @@ const Home: React.FC = () => {
   };
 
   return (
-    <main className="h-screen flex flex-col overflow-y-auto">
-      <h1 className="mb-4 text-6xl font-semibold text-slate-600">
+    <main className="flex flex-col overflow-y-auto bg-slate-900 p-6">
+      <h1 className="mb-4 text-6xl font-light text-center bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
         {t("home.greeting")}
         <br />
       </h1>
       <div className="animate-bounce">
         <svg
-          className="mx-auto h-16 w-16 text-red-500"
+          className="mx-auto h-10 w-10 text-red-500 translate-x-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -49,8 +50,8 @@ const Home: React.FC = () => {
           ></path>
         </svg>
       </div>
-      <div className="flex flex-col gap-4 w-1/2 mx-auto mb-4">
-        <p className="mt-4 text-gray-600 ">Select language:</p>
+      <div className="flex flex-col gap-4 mx-auto mb-4">
+        <p className="mt-4 text-white ">Select language:</p>
         <Button onClick={() => changeLanguage("en")}>
           Change Language to English
         </Button>
@@ -58,13 +59,17 @@ const Home: React.FC = () => {
           Change Language to Spanish
         </Button>
       </div>
-      <div className="text-xl font-semibold text-slate-600 gap-2 mt-2 flex items-center justify-center">
-        Sample users(with api):
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
-        {users?.map((user) => (
-          <UserCard user={user} />
-        ))}
+      <ToolsOverview />
+      <div className="container mx-auto px-2 py-2 gap-4 mt-4">
+        <div className="text-xl font-light flex text-white">
+          Sample Users from-
+          <b> Api call </b>
+        </div>
+        <div className="grid grid-cols-3 md:grid-cols-4 sm:grid-cols-2 gap-4 mt-2">
+          {users?.map((user) => (
+            <UserCard user={user} />
+          ))}
+        </div>
       </div>
     </main>
   );

@@ -47,3 +47,18 @@ Built with type safety, scalability, and developer experience in mind. A batteri
 - [Husky](https://github.com/typicode/husky#readme) + [Commitizen](https://github.com/commitizen/cz-cli#readme) + [Commitlint](https://github.com/conventional-changelog/commitlint#readme) - Git hooks and commit linting to ensure use of descriptive and practical commit messages
 - [ts-reset](https://github.com/total-typescript/ts-reset#readme) - Improvements for TypeScripts built-in typings for use in applications
 - [Docker](https://www.docker.com) - Containerization tool for deploying your vite-react-boilerplate app
+
+## Available Scripts
+
+In this project, the following scripts are available:
+
+- **`bootstrap`**: Initializes the project with Husky and Playwright.
+- **`format`**: Formats the code using Prettier.
+- **`lint`**: Lints the code with ESLint to ensure coding standards are followed.
+- **`dev`**: Starts the development server using Vite.
+- **`storybook`**: Launches Storybook in development mode to view and test UI components.
+- **`test`**: Runs unit and end-to-end tests.
+- **`build`**: Builds the project for production using Vite.
+- **`preview`**: Starts the preview server with Vite to view the production build locally.
+- **`commitlint`**: Lints commit messages to ensure they follow the defined conventions.
+- **`commitizen`**: Initializes Commitizen to assist with conventional commit message formatting.

@@ -1,5 +1,12 @@
-import { EnvelopeClosedIcon, GlobeIcon } from "@radix-ui/react-icons";
-import { Building, Phone } from "lucide-react";
+import { Mail, Phone, Globe, MapPin, Briefcase } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type User = {
   id: number;
@@ -25,54 +32,91 @@ type User = {
   };
 };
 
-type UserCardProps = {
+interface UserCardProps {
   user: User;
-};
+}
 
-const UserCard: React.FC<UserCardProps> = ({ user }: UserCardProps) => {
+export default function UserCard({ user }: UserCardProps): JSX.Element {
   return (
-    <div
-      key={user.id}
-      className="max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden"
-    >
-      {/* Header Section */}
-      <div className="bg-blue-500 text-white p-6">
-        <h2 className="text-2xl font-bold">{user.name}</h2>
-        <p className="text-sm">@{user.username}</p>
-      </div>
-
-      {/* Content Section */}
-      <div className="p-6 space-y-4">
-        {/* Phone */}
-        <div className="flex items-center text-gray-700">
-          <Phone className="text-blue-500 mr-2" />
-          <span>{user.phone}</span>
-        </div>
-
-        {/* Email */}
-        <div className="flex items-center text-gray-700">
-          <EnvelopeClosedIcon className="text-blue-500 mr-2" />
-          <span>{user.email}</span>
-        </div>
-
-        {/* Website */}
-        <div className="flex items-center text-gray-700">
-          <GlobeIcon className="text-blue-500 mr-2" />
-          <span>{user.website}</span>
-        </div>
-
-        {/* Company */}
-        <div className="flex items-center text-gray-700">
-          <Building className="text-blue-500 mr-2" />
-          <span>{user.company.name}</span>
-        </div>
-
-        {/* Company CatchPhrase and BS */}
-        <p className="text-gray-500 text-sm">{user.company.catchPhrase}</p>
-        <p className="text-gray-500 text-sm">{user.company.bs}</p>
-      </div>
-    </div>
+    <TooltipProvider>
+      <Card className="w-full max-w-xs mx-auto">
+        <CardHeader className="space-y-0 pb-2">
+          <div className="flex items-center space-x-2">
+            <Avatar className="w-10 h-10">
+              <AvatarFallback>
+                {user.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-base">{user.name}</CardTitle>
+              <p className="text-xs text-muted-foreground">@{user.username}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-2 text-sm">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <Mail className="w-3 h-3 mr-1" />
+                <span className="truncate">{user.email}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{user.email}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <Phone className="w-3 h-3 mr-1" />
+                <span className="truncate">{user.phone}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{user.phone}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <Globe className="w-3 h-3 mr-1" />
+                <span className="truncate">{user.website}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{user.website}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <MapPin className="w-3 h-3 mr-1" />
+                <span className="truncate">{user.address.city}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{`${user.address.street}, ${user.address.city}`}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center col-span-2">
+                <Briefcase className="w-3 h-3 mr-1" />
+                <span className="truncate">{user.company.name}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{user.company.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {user.company.catchPhrase}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </CardContent>
+      </Card>
+    </TooltipProvider>
   );
-};
-
-export default UserCard;
+}
