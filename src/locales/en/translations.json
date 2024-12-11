@@ -1,5 +1,6 @@
 {
   "home": {
-    "greeting": "Built with type safety, scalability, and developer experience in mind."
+    "greeting": "Built with type safety, scalability, and developer experience in mind.",
+    "get_started": "Get Started"
   }
 }
