@@ -2,6 +2,7 @@ import ToolsOverview from "@/components/tools-overview";
 import { Button } from "@/components/ui/button/button";
 import UserCard from "@/components/user-card";
 import { useLazyGetUserQuery } from "@/services/user";
+import { ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -35,20 +36,17 @@ const Home: React.FC = () => {
         {t("home.greeting")}
         <br />
       </h1>
-      <div className="animate-bounce">
-        <svg
-          className="mx-auto h-10 w-10 text-red-500 translate-x-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="flex flex-col gap-4 mx-auto mb-4 group">
+        <Button
+          className="hover:bg-gradient-to-r from-fuchsia-500 to-cyan-500 translate-x-2"
+          onClick={() => {
+            window.location.href =
+              "https://github.com/tejachundru/react-vite-starter?tab=readme-ov-file#get-started";
+          }}
         >
-          <path
-            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-          ></path>
-        </svg>
+          {t("home.get_started")}
+          <ArrowRight className="ml-1 size-4 group-hover:size-6 translate-x-2 duration-300" />
+        </Button>
       </div>
       <div className="flex flex-col gap-4 mx-auto mb-4">
         <p className="mt-4 text-white ">Select language:</p>
