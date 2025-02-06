@@ -46,7 +46,7 @@ export function Sizes(): JSX.Element {
 export function WithIcon(): JSX.Element {
   return (
     <Button>
-      <PlusCircle className="mr-2 h-4 w-4" />
+      <PlusCircle className="mr-2 size-4" />
       Add
     </Button>
   );

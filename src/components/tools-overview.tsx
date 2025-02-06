@@ -129,18 +129,18 @@ const bgColors = [
 
 export default function DevelopmentToolsGrid(): JSX.Element {
   return (
-    <div className="container mx-auto px-2 py-2">
-      <h1 className="text-2xl font-light mb-6 text-white">Powered by tools</h1>
+    <div className="container mx-auto p-2">
+      <h1 className="mb-6 text-2xl font-light text-white">Powered by tools</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tools.map((tool, index) => (
           <Card
             key={tool.name}
-            className={`flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-300 ${
+            className={`flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-md ${
               bgColors[index % bgColors.length]
             }`}
           >
             <CardHeader className="p-4 pb-0">
-              <CardTitle className="text-md flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-base">
                 <span className="truncate">{tool.name}</span>
                 <a
                   className="text-muted-foreground hover:text-primary"
@@ -148,13 +148,13 @@ export default function DevelopmentToolsGrid(): JSX.Element {
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink className="size-4" />
                   <span className="sr-only">Visit {tool.name}</span>
                 </a>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 pt-0 flex-1">
-              <p className="text-xs text-muted-foreground line-clamp-3">
+            <CardContent className="flex-1 p-4 pt-0">
+              <p className="line-clamp-3 text-xs text-muted-foreground">
                 {tool.description}
               </p>
             </CardContent>

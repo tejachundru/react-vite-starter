@@ -32,23 +32,23 @@ const Home: React.FC = () => {
 
   return (
     <main className="flex flex-col overflow-y-auto bg-slate-900 p-6">
-      <h1 className="mb-4 text-6xl font-light text-center bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+      <h1 className="mb-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-center text-6xl font-light text-transparent">
         {t("home.greeting")}
         <br />
       </h1>
-      <div className="flex flex-col gap-4 mx-auto mb-4 group">
+      <div className="group mx-auto mb-4 flex flex-col gap-4">
         <Button
-          className="hover:bg-gradient-to-r from-fuchsia-500 to-cyan-500 translate-x-2"
+          className="translate-x-2 from-fuchsia-500 to-cyan-500 hover:bg-gradient-to-r"
           onClick={() => {
             window.location.href =
               "https://github.com/tejachundru/react-vite-starter?tab=readme-ov-file#get-started";
           }}
         >
           {t("home.get_started")}
-          <ArrowRight className="ml-1 size-4 group-hover:size-6 translate-x-2 duration-300" />
+          <ArrowRight className="ml-1 size-4 translate-x-2 duration-300 group-hover:size-6" />
         </Button>
       </div>
-      <div className="flex flex-col gap-4 mx-auto mb-4">
+      <div className="mx-auto mb-4 flex flex-col gap-4">
         <p className="mt-4 text-white ">Select language:</p>
         <Button onClick={() => changeLanguage("en")}>
           Change Language to English
@@ -58,12 +58,12 @@ const Home: React.FC = () => {
         </Button>
       </div>
       <ToolsOverview />
-      <div className="container mx-auto px-2 py-2 gap-4 mt-4">
-        <div className="text-xl font-light flex text-white">
+      <div className="container mx-auto mt-4 gap-4 p-2">
+        <div className="flex text-xl font-light text-white">
           Sample Users from-
           <b> Api call </b>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-4 sm:grid-cols-2 gap-4 mt-2">
+        <div className="mt-2 grid grid-cols-3 gap-4 sm:grid-cols-2 md:grid-cols-4">
           {users?.map((user) => (
             <UserCard user={user} />
           ))}

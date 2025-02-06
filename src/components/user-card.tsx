@@ -39,10 +39,10 @@ interface UserCardProps {
 export default function UserCard({ user }: UserCardProps): JSX.Element {
   return (
     <TooltipProvider>
-      <Card className="w-full max-w-xs mx-auto">
+      <Card className="mx-auto w-full max-w-xs">
         <CardHeader className="space-y-0 pb-2">
           <div className="flex items-center space-x-2">
-            <Avatar className="w-10 h-10">
+            <Avatar className="size-10">
               <AvatarFallback>
                 {user.name
                   .split(" ")
@@ -60,7 +60,7 @@ export default function UserCard({ user }: UserCardProps): JSX.Element {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
-                <Mail className="w-3 h-3 mr-1" />
+                <Mail className="mr-1 size-3" />
                 <span className="truncate">{user.email}</span>
               </div>
             </TooltipTrigger>
@@ -71,7 +71,7 @@ export default function UserCard({ user }: UserCardProps): JSX.Element {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
-                <Phone className="w-3 h-3 mr-1" />
+                <Phone className="mr-1 size-3" />
                 <span className="truncate">{user.phone}</span>
               </div>
             </TooltipTrigger>
@@ -82,7 +82,7 @@ export default function UserCard({ user }: UserCardProps): JSX.Element {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
-                <Globe className="w-3 h-3 mr-1" />
+                <Globe className="mr-1 size-3" />
                 <span className="truncate">{user.website}</span>
               </div>
             </TooltipTrigger>
@@ -93,7 +93,7 @@ export default function UserCard({ user }: UserCardProps): JSX.Element {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center">
-                <MapPin className="w-3 h-3 mr-1" />
+                <MapPin className="mr-1 size-3" />
                 <span className="truncate">{user.address.city}</span>
               </div>
             </TooltipTrigger>
@@ -103,8 +103,8 @@ export default function UserCard({ user }: UserCardProps): JSX.Element {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center col-span-2">
-                <Briefcase className="w-3 h-3 mr-1" />
+              <div className="col-span-2 flex items-center">
+                <Briefcase className="mr-1 size-3" />
                 <span className="truncate">{user.company.name}</span>
               </div>
             </TooltipTrigger>
