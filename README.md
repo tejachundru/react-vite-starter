@@ -62,3 +62,23 @@ In this project, the following scripts are available:
 - **`preview`**: Starts the preview server with Vite to view the production build locally.
 - **`commitlint`**: Lints commit messages to ensure they follow the defined conventions.
 - **`commitizen`**: Initializes Commitizen to assist with conventional commit message formatting.
+
+## Docker build
+
+### Build the Docker image
+
+To build the Docker image for your application, use the following command:
+
+### Development
+
+```sh
+docker build -t vite-starter .
+```
+
+### Production image build
+
+This image is production-optimized using a multi-stage build for a minimal footprint with built-in nginx configuration to efficiently serve your application.
+
+```sh
+docker build -t my-app -f ./dockerizer/Dockerfile .
+```
