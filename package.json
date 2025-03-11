@@ -12,6 +12,7 @@
     "storybook": "storybook dev -p 6006",
     "storybook:setup": "node node_modules/@storybook/addon-styling/bin/postinstall.js",
     "storybook:build": "storybook build",
+    "storybook:test": "test-storybook",
     "test": "vitest run src/ && playwright test",
     "test:unit": "vitest src/",
     "test:unit:coverage": "vitest --coverage src/",
@@ -21,7 +22,12 @@
     "preview": "vite preview",
     "commitlint": "commitlint --edit",
     "commitizen": "exec < /dev/tty && git cz --hook || true",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "tsc --noEmit",
+    "analyze": "vite build --mode analyze",
+    "clean": "shx rm -rf dist node_modules/.vite coverage storybook-static",
+    "docker:build": "docker build -t react-vite-starter -f ./Dockerfile .",
+    "docker:run": "docker run -p 8080:80 react-vite-starter"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.1",
