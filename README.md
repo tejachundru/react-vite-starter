@@ -78,7 +78,6 @@ In this project, the following scripts are available:
 ```
 react-vite-starter/
 ├── .storybook/          # Storybook configuration
-├── dockerizer/          # Docker configuration
 ├── e2e/                 # End-to-end tests
 ├── public/              # Static assets
 ├── src/
