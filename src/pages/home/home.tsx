@@ -11,18 +11,8 @@ const Home: React.FC = () => {
   const [getUsers, { isLoading, data: users }] = useLazyGetUserQuery();
 
   useEffect(() => {
-    getUsers()
-      .then(() => {
-        console.log("Users fetched");
-      })
-      .catch(() => {
-        console.log("Error fetching users");
-      });
+    void getUsers();
   }, []);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   const changeLanguage: (lng: string) => Promise<void> = async (
     lng: string
@@ -63,9 +53,14 @@ const Home: React.FC = () => {
           Sample Users from-
           <b> Api call </b>
         </div>
+        {isLoading && (
+          <div className="flex items-center justify-center">
+            <p className="text-white">Loading users data...</p>
+          </div>
+        )}
         <div className="mt-2 grid grid-cols-3 gap-4 sm:grid-cols-2 md:grid-cols-4">
           {users?.map((user) => (
-            <UserCard user={user} />
+            <UserCard key={user.id} user={user} />
           ))}
         </div>
       </div>
