@@ -22,13 +22,13 @@ const Home: React.FC = () => {
 
   return (
     <main className="flex flex-col overflow-y-auto bg-slate-900 p-6">
-      <h1 className="mb-4 bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-center text-6xl font-light text-transparent">
+      <h1 className="mb-4 bg-linear-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-center text-6xl font-light text-transparent">
         {t("home.greeting")}
         <br />
       </h1>
       <div className="group mx-auto mb-4 flex flex-col gap-4">
         <Button
-          className="translate-x-2 from-fuchsia-500 to-cyan-500 hover:bg-gradient-to-r"
+          className="translate-x-2 from-fuchsia-500 to-cyan-500 hover:bg-linear-to-r"
           onClick={() => {
             window.location.href =
               "https://github.com/tejachundru/react-vite-starter?tab=readme-ov-file#get-started";
