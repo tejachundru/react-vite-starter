@@ -1,49 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense, ComponentType, ReactNode } from "react";
 
 interface Options {
-  fallback: React.ReactNode;
+  fallback?: ReactNode;
 }
+
 type Unpromisify<T> = T extends Promise<infer P> ? P : never;
 
-/**
- * @example
- * ```tsx
- * // Dynamically load a component without a selector function
- * const LazyComponent = lazyLoad(() => import('./MyComponent'));
- *
- * // Dynamically load a component with a selector function
- * const LazyComponent = lazyLoad(
- *   () => import('./MyComponent'),
- *   (module) => module.MyComponent
- * );
- *
- * // Use the lazy-loaded component in your JSX
- * <LazyComponent someProp="value" />
- * ```
- */
-export const lazyLoad = <
+export function lazyLoad<
   T extends Promise<any>,
-  U extends React.ComponentType<any>
+  U extends ComponentType<any>
 >(
   importFn: () => T,
-  selectorFn?: (s: Unpromisify<T>) => U,
-  options: Options = { fallback: null }
-) => {
-  let lazyFactory: () => Promise<{ default: U }> = importFn;
-
-  if (selectorFn) {
-    lazyFactory = (): Promise<{ default: U }> =>
-      importFn().then((module: Unpromisify<T>) => ({
-        default: selectorFn(module),
-      }));
-  }
+  selectorFn?: (module: Unpromisify<T>) => U,
+  options?: Options
+) {
+  const lazyFactory = () =>
+    importFn().then((module: Unpromisify<T>) => ({
+      default: selectorFn ? selectorFn(module) : module.default,
+    }));
 
   const LazyComponent = lazy(lazyFactory);
 
-  return (props: React.ComponentProps<U>): JSX.Element => (
-    <Suspense fallback={options.fallback}>
+  return (props: React.ComponentProps<U>) => (
+    <Suspense fallback={options?.fallback ?? null}>
       <LazyComponent {...props} />
     </Suspense>
   );
-};
+}

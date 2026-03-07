@@ -65,88 +65,41 @@ export function useMetaTags({
   url?: string;
 }): void {
   useEffect(() => {
-    // Store original values
-    const originalTitle = document.title;
-    const originalDescription =
-      document
-        .querySelector('meta[name="description"]')
-        ?.getAttribute("content") || "";
-    const originalOgTitle =
-      document
-        .querySelector('meta[property="og:title"]')
-        ?.getAttribute("content") || "";
-    const originalOgDescription =
-      document
-        .querySelector('meta[property="og:description"]')
-        ?.getAttribute("content") || "";
-    const originalOgImage =
-      document
-        .querySelector('meta[property="og:image"]')
-        ?.getAttribute("content") || "";
-    const originalOgUrl =
-      document
-        .querySelector('meta[property="og:url"]')
-        ?.getAttribute("content") || "";
+    if (typeof document === "undefined") return;
 
-    // Update meta tags if values are provided
+    const updateMeta = (name: string, content: string) => {
+      const attr = name.startsWith("og:") ? "property" : "name";
+
+      let tag = document.querySelector(`meta[${attr}="${name}"]`);
+
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute(attr, name);
+        document.head.appendChild(tag);
+      }
+
+      tag.setAttribute("content", content);
+    };
+
     if (title) {
       document.title = title;
-      updateMetaTag("og:title", title);
-      updateMetaTag("twitter:title", title);
+      updateMeta("og:title", title);
+      updateMeta("twitter:title", title);
     }
 
     if (description) {
-      updateMetaTag("description", description);
-      updateMetaTag("og:description", description);
-      updateMetaTag("twitter:description", description);
+      updateMeta("description", description);
+      updateMeta("og:description", description);
+      updateMeta("twitter:description", description);
     }
 
     if (image) {
-      updateMetaTag("og:image", image);
-      updateMetaTag("twitter:image", image);
+      updateMeta("og:image", image);
+      updateMeta("twitter:image", image);
     }
 
     if (url) {
-      updateMetaTag("og:url", url);
+      updateMeta("og:url", url);
     }
-
-    // Helper function to update or create meta tags
-    function updateMetaTag(name: string, content: string): void {
-      const property = name.includes(":") ? "property" : "name";
-      let meta = document.querySelector(`meta[${property}="${name}"]`);
-
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.setAttribute(property, name);
-        document.head.appendChild(meta);
-      }
-
-      meta.setAttribute("content", content);
-    }
-
-    // Cleanup function to restore original meta tags
-    return () => {
-      document.title = originalTitle;
-
-      if (originalDescription) {
-        updateMetaTag("description", originalDescription);
-      }
-
-      if (originalOgTitle) {
-        updateMetaTag("og:title", originalOgTitle);
-      }
-
-      if (originalOgDescription) {
-        updateMetaTag("og:description", originalOgDescription);
-      }
-
-      if (originalOgImage) {
-        updateMetaTag("og:image", originalOgImage);
-      }
-
-      if (originalOgUrl) {
-        updateMetaTag("og:url", originalOgUrl);
-      }
-    };
   }, [title, description, image, url]);
 }

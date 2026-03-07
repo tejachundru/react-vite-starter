@@ -52,26 +52,32 @@ export function useDisclosure(
   const [isOpen, setIsOpen] = useState(defaultIsOpen);
 
   const onOpen = useCallback(() => {
-    setIsOpen(true);
-    if (onOpenProp) {
-      onOpenProp();
-    }
+    setIsOpen((prev) => {
+      if (!prev) {
+        onOpenProp?.();
+        return true;
+      }
+      return prev;
+    });
   }, [onOpenProp]);
 
   const onClose = useCallback(() => {
-    setIsOpen(false);
-    if (onCloseProp) {
-      onCloseProp();
-    }
+    setIsOpen((prev) => {
+      if (prev) {
+        onCloseProp?.();
+        return false;
+      }
+      return prev;
+    });
   }, [onCloseProp]);
 
   const onToggle = useCallback(() => {
-    if (isOpen) {
-      onClose();
-    } else {
-      onOpen();
-    }
-  }, [isOpen, onOpen, onClose]);
+    setIsOpen((prev) => {
+      const next = !prev;
+      next ? onOpenProp?.() : onCloseProp?.();
+      return next;
+    });
+  }, [onOpenProp, onCloseProp]);
 
   return { isOpen, onOpen, onClose, onToggle };
 }

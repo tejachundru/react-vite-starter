@@ -1,159 +1,167 @@
-import { useState, useEffect, useRef } from "react";
-
-type LocalStorageValue<T> = T | null;
+import { useEffect, useState } from "react";
 
 /**
- * A hook for persisting state in localStorage with type safety
+ * Type for the setter function returned by storage hooks.
+ *
+ * Works exactly like React's setState:
+ *
+ * - Accepts a direct value
+ * - Or a function that receives the previous value
+ */
+type SetValue<T> = (value: T | ((val: T) => T)) => void;
+
+/**
+ * Factory function for creating storage hooks.
+ *
+ * This allows us to reuse the same logic for:
+ * - localStorage
+ * - sessionStorage
+ *
+ * @param storage - The storage object (localStorage or sessionStorage)
+ */
+function createStorageHook(storage: Storage) {
+  /**
+   * Hook for persisting state inside browser storage.
+   *
+   * @template T - Type of the stored value
+   *
+   * @param key - Storage key
+   * @param initialValue - Default value used if storage is empty
+   *
+   * @returns A tuple containing:
+   * - stored value
+   * - setter function (same API as React useState)
+   *
+   * @example
+   * ```tsx
+   * const [theme, setTheme] = useLocalStorage("theme", "light");
+   *
+   * setTheme("dark");
+   * ```
+   */
+  return function useStorage<T>(
+    key: string,
+    initialValue: T
+  ): [T, SetValue<T>] {
+    /**
+     * Initialize state by reading from storage.
+     * Lazy initialization prevents unnecessary reads on re-render.
+     */
+    const [storedValue, setStoredValue] = useState<T>(() => {
+      if (typeof window === "undefined") {
+        return initialValue;
+      }
+
+      try {
+        const item = storage.getItem(key);
+        return item ? JSON.parse(item) : initialValue;
+      } catch (error) {
+        console.error(`Error reading storage key "${key}":`, error);
+        return initialValue;
+      }
+    });
+
+    /**
+     * Updates both React state and browser storage.
+     *
+     * Supports functional updates like React's setState.
+     */
+    const setValue: SetValue<T> = (value) => {
+      try {
+        const valueToStore =
+          typeof value === "function"
+            ? (value as (val: T) => T)(storedValue)
+            : value;
+
+        setStoredValue(valueToStore);
+
+        if (typeof window !== "undefined") {
+          storage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch (error) {
+        console.error(`Error setting storage key "${key}":`, error);
+      }
+    };
+
+    /**
+     * Listen for storage updates across browser tabs.
+     *
+     * The "storage" event fires when another tab modifies storage.
+     */
+    useEffect(() => {
+      const handleStorageChange = (event: StorageEvent) => {
+        if (event.key === key && event.newValue) {
+          try {
+            setStoredValue(JSON.parse(event.newValue));
+          } catch (error) {
+            console.error(`Error parsing storage value:`, error);
+          }
+        }
+      };
+
+      window.addEventListener("storage", handleStorageChange);
+
+      return () => {
+        window.removeEventListener("storage", handleStorageChange);
+      };
+    }, [key]);
+
+    return [storedValue, setValue];
+  };
+}
+
+/**
+ * Hook for persisting state inside **localStorage**.
+ *
+ * localStorage persists data across browser sessions.
  *
  * @example
  * ```tsx
- * // Store and retrieve user preferences
- * const UserSettings = () => {
- *   const [theme, setTheme] = useLocalStorage('theme', 'light');
- *   const [fontSize, setFontSize] = useLocalStorage('fontSize', 16);
+ * const [theme, setTheme] = useLocalStorage("theme", "light");
  *
- *   return (
- *     <div>
- *       <div>
- *         <label>Theme: </label>
- *         <select
- *           value={theme}
- *           onChange={(e) => setTheme(e.target.value)}
- *         >
- *           <option value="light">Light</option>
- *           <option value="dark">Dark</option>
- *         </select>
- *       </div>
+ * return (
+ *   <button onClick={() => setTheme("dark")}>
+ *     Switch Theme
+ *   </button>
+ * );
+ * ```
  *
- *       <div>
- *         <label>Font Size: </label>
- *         <input
- *           type="number"
- *           value={fontSize}
- *           onChange={(e) => setFontSize(Number(e.target.value))}
- *         />
- *       </div>
- *     </div>
- *   );
- * };
+ * @example
+ * Functional updates
+ * ```tsx
+ * const [count, setCount] = useLocalStorage("count", 0);
+ *
+ * setCount((prev) => prev + 1);
  * ```
  */
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((val: T) => T)) => void] {
-  // Create a ref for the initial mount
-  const initialMount = useRef(true);
-
-  // State to store our value
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") {
-      return initialValue;
-    }
-
-    try {
-      // Get from local storage by key
-      const item = window.localStorage.getItem(key);
-      // Parse stored json or if none return initialValue
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      // If error also return initialValue
-      console.error(`Error reading localStorage key "${key}":`, error);
-      return initialValue;
-    }
-  });
-
-  // Return a wrapped version of useState's setter function that persists the new value to localStorage
-  const setValue = (value: T | ((val: T) => T)): void => {
-    try {
-      // Allow value to be a function so we have the same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-
-      // Save state
-      setStoredValue(valueToStore);
-
-      // Save to local storage
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
-    }
-  };
-
-  // Listen for changes to this localStorage key in other tabs/windows
-  useEffect(() => {
-    // Skip this on the initial mount, since we already get the value in the useState initializer
-    if (initialMount.current) {
-      initialMount.current = false;
-      return;
-    }
-
-    const handleStorageChange = (e: StorageEvent): void => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          setStoredValue(JSON.parse(e.newValue));
-        } catch (error) {
-          console.error(`Error parsing localStorage value:`, error);
-        }
-      }
-    };
-
-    // Add event listener for 'storage' event
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [key]);
-
-  return [storedValue, setValue];
-}
+export const useLocalStorage =
+  typeof window !== "undefined"
+    ? createStorageHook(window.localStorage)
+    : (() => {}) as any;
 
 /**
- * A hook for persisting state in sessionStorage with type safety
+ * Hook for persisting state inside **sessionStorage**.
+ *
+ * sessionStorage persists data only for the duration of the browser tab.
+ * Data is cleared when the tab or window is closed.
+ *
+ * @example
+ * ```tsx
+ * const [token, setToken] = useSessionStorage("token", "");
+ *
+ * setToken("abc123");
+ * ```
+ *
+ * @example
+ * Using with form data
+ * ```tsx
+ * const [formData, setFormData] = useSessionStorage("form", {
+ *   name: "",
+ *   email: "",
+ * });
+ * ```
  */
-export function useSessionStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((val: T) => T)) => void] {
-  // State to store our value
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") {
-      return initialValue;
-    }
-
-    try {
-      // Get from session storage by key
-      const item = window.sessionStorage.getItem(key);
-      // Parse stored json or if none return initialValue
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      // If error also return initialValue
-      console.error(`Error reading sessionStorage key "${key}":`, error);
-      return initialValue;
-    }
-  });
-
-  // Return a wrapped version of useState's setter function that persists the new value to sessionStorage
-  const setValue = (value: T | ((val: T) => T)): void => {
-    try {
-      // Allow value to be a function so we have the same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-
-      // Save state
-      setStoredValue(valueToStore);
-
-      // Save to session storage
-      if (typeof window !== "undefined") {
-        window.sessionStorage.setItem(key, JSON.stringify(valueToStore));
-      }
-    } catch (error) {
-      console.error(`Error setting sessionStorage key "${key}":`, error);
-    }
-  };
-
-  return [storedValue, setValue];
-}
+export const useSessionStorage =
+  typeof window !== "undefined"
+    ? createStorageHook(window.sessionStorage)
+    : (() => {}) as any;
