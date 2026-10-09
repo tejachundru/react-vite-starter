@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

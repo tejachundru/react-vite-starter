@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { BrowserRouter } from "react-router-dom";
 import Router from "./router";
 import store from "./store";

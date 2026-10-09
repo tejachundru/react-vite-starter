@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "./button";
 

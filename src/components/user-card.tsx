@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { Mail, Phone, Globe, MapPin, Briefcase } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

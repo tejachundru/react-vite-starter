@@ -1,7 +1,7 @@
 import { fixupPluginRules } from "@eslint/compat";
 import eslintJS from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
-//import eslintPluginStorybook from "eslint-plugin-storybook" // does not support eslint v9
+import eslintPluginStorybook from "eslint-plugin-storybook";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginImport from "eslint-plugin-import";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
@@ -13,7 +13,6 @@ import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 import tailwind from "eslint-plugin-tailwindcss";
 
-const patchedReactHooksPlugin = fixupPluginRules(eslintPluginReactHooks);
 const patchedImportPlugin = fixupPluginRules(eslintPluginImport);
 
 const baseESLintConfig = {
@@ -98,7 +97,7 @@ const reactConfig = {
   name: "react",
   extends: [eslintPluginReact.configs.flat["jsx-runtime"]],
   plugins: {
-    "react-hooks": patchedReactHooksPlugin,
+    "react-hooks": eslintPluginReactHooks,
     "react-refresh": eslintPluginReactRefresh,
   },
   rules: {
@@ -123,7 +122,7 @@ const reactConfig = {
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/exhaustive-deps": "error",
-    ...patchedReactHooksPlugin.configs.recommended.rules,
+    ...eslintPluginReactHooks.configs["recommended-latest"].rules,
     "react-refresh/only-export-components": [
       "warn",
       { allowConstantExport: true },
@@ -160,7 +159,7 @@ const unicornConfig = {
     "unicorn/no-console-spaces": "error",
     "unicorn/no-null": "off",
     "unicorn/filename-case": "off",
-    "unicorn/prevent-abbreviations": [
+    "unicorn/name-replacements": [
       "error",
       {
         replacements: {
@@ -186,10 +185,12 @@ const unicornConfig = {
 
 const tailwindConfig = {
   name: "tailwind-config",
-  plugins: {
-    tailwind: tailwind,
+  settings: {
+    tailwindcss: {
+      cssConfigPath: "./src/index.css",
+    },
   },
-  extends: [...tailwind.configs["flat/recommended"]],
+  extends: [tailwind.configs.recommended],
 };
 
 const eslintConfig = typescriptEslint.config(
@@ -199,7 +200,8 @@ const eslintConfig = typescriptEslint.config(
   reactConfig,
   jsxA11yConfig,
   unicornConfig,
-  tailwindConfig
+  tailwindConfig,
+  eslintPluginStorybook.configs["flat/recommended"]
 );
 
 eslintConfig.map((config) => {
