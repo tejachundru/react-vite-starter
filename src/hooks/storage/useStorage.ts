@@ -8,7 +8,12 @@ import { useEffect, useState } from "react";
  * - Accepts a direct value
  * - Or a function that receives the previous value
  */
-type SetValue<T> = (value: T | ((val: T) => T)) => void;
+type SetValue<T> = (value: T | ((value_: T) => T)) => void;
+
+type UseStorageHook = <T>(
+  key: string,
+  initialValue: T
+) => [T, SetValue<T>];
 
 /**
  * Factory function for creating storage hooks.
@@ -44,7 +49,7 @@ function createStorageHook(storage: Storage) {
     initialValue: T
   ): [T, SetValue<T>] {
     /**
-     * Initialize state by reading from storage.
+      * Initialize state by reading from storage.
      * Lazy initialization prevents unnecessary reads on re-render.
      */
     const [storedValue, setStoredValue] = useState<T>(() => {
@@ -54,7 +59,7 @@ function createStorageHook(storage: Storage) {
 
       try {
         const item = storage.getItem(key);
-        return item ? JSON.parse(item) : initialValue;
+        return item ? (JSON.parse(item) as T) : initialValue;
       } catch (error) {
         console.error(`Error reading storage key "${key}":`, error);
         return initialValue;
@@ -70,7 +75,7 @@ function createStorageHook(storage: Storage) {
       try {
         const valueToStore =
           typeof value === "function"
-            ? (value as (val: T) => T)(storedValue)
+            ? (value as (value_: T) => T)(storedValue)
             : value;
 
         setStoredValue(valueToStore);
@@ -89,10 +94,10 @@ function createStorageHook(storage: Storage) {
      * The "storage" event fires when another tab modifies storage.
      */
     useEffect(() => {
-      const handleStorageChange = (event: StorageEvent) => {
+      const handleStorageChange = (event: StorageEvent): void => {
         if (event.key === key && event.newValue) {
           try {
-            setStoredValue(JSON.parse(event.newValue));
+            setStoredValue(JSON.parse(event.newValue) as T);
           } catch (error) {
             console.error(`Error parsing storage value:`, error);
           }
@@ -101,7 +106,7 @@ function createStorageHook(storage: Storage) {
 
       window.addEventListener("storage", handleStorageChange);
 
-      return () => {
+      return (): void => {
         window.removeEventListener("storage", handleStorageChange);
       };
     }, [key]);
@@ -134,10 +139,10 @@ function createStorageHook(storage: Storage) {
  * setCount((prev) => prev + 1);
  * ```
  */
-export const useLocalStorage =
+export const useLocalStorage: UseStorageHook =
   typeof window !== "undefined"
     ? createStorageHook(window.localStorage)
-    : (() => {}) as any;
+    : ((_key: string, initialValue: unknown) => [initialValue, (): void => {}]) as UseStorageHook;
 
 /**
  * Hook for persisting state inside **sessionStorage**.
@@ -161,7 +166,7 @@ export const useLocalStorage =
  * });
  * ```
  */
-export const useSessionStorage =
+export const useSessionStorage: UseStorageHook =
   typeof window !== "undefined"
     ? createStorageHook(window.sessionStorage)
-    : (() => {}) as any;
+    : ((_key: string, initialValue: unknown) => [initialValue, (): void => {}]) as UseStorageHook;

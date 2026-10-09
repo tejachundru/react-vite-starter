@@ -12,7 +12,7 @@ const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   prepareHeaders: (headers, { getState }) => {
     // TODO: add auth token
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
       console.log("headers", headers, getState());
     }
     // const token = localStorage.getItem("token"); or

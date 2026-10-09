@@ -1,4 +1,10 @@
-import React, { lazy, Suspense, ComponentType, ReactNode } from "react";
+import {
+  lazy,
+  Suspense,
+  type ComponentProps,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 
 interface Options {
   fallback?: ReactNode;
@@ -6,22 +12,21 @@ interface Options {
 
 type Unpromisify<T> = T extends Promise<infer P> ? P : never;
 
-export function lazyLoad<
-  T extends Promise<any>,
-  U extends ComponentType<any>
->(
+export function lazyLoad<T extends Promise<unknown>, U extends ComponentType>(
   importFn: () => T,
   selectorFn?: (module: Unpromisify<T>) => U,
   options?: Options
-) {
-  const lazyFactory = () =>
-    importFn().then((module: Unpromisify<T>) => ({
-      default: selectorFn ? selectorFn(module) : module.default,
+): (props: ComponentProps<U>) => ReactNode {
+  const lazyFactory = (): Promise<{ default: ComponentType }> =>
+    importFn().then((module) => ({
+      default: selectorFn
+        ? selectorFn(module as Unpromisify<T>)
+        : (module as { default: ComponentType }).default,
     }));
 
   const LazyComponent = lazy(lazyFactory);
 
-  return (props: React.ComponentProps<U>) => (
+  return (props: ComponentProps<U>): ReactNode => (
     <Suspense fallback={options?.fallback ?? null}>
       <LazyComponent {...props} />
     </Suspense>

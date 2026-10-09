@@ -12,7 +12,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     void getUsers();
-  }, []);
+  }, [getUsers]);
 
   const changeLanguage: (lng: string) => Promise<void> = async (
     lng: string

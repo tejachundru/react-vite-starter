@@ -162,6 +162,7 @@ const unicornConfig = {
     "unicorn/name-replacements": [
       "error",
       {
+        checkFilenames: false,
         replacements: {
           db: false,
           arg: false,
@@ -191,9 +192,38 @@ const tailwindConfig = {
     },
   },
   extends: [tailwind.configs.recommended],
+  rules: {
+    // `cn(...inputs)` spreads arbitrary classnames; can't be statically resolved
+    "tailwindcss/no-custom-classname": [
+      "error",
+      { whitelist: ["inputs"] },
+    ],
+  },
+};
+
+const uiOverrides = {
+  name: "ui-overrides",
+  // shadcn-style components export cva variants next to the component
+  rules: {
+    "react-refresh/only-export-components": "off",
+  },
+};
+
+const storybookMainParser = {
+  name: "storybook:main-parser",
+  files: [".storybook/main.ts"],
+  languageOptions: {
+    parser: tsParser,
+  },
+};
+
+const ignoresConfig = {
+  name: "global-ignores",
+  ignores: ["dist/**", "storybook-static/**", "coverage/**"],
 };
 
 const eslintConfig = typescriptEslint.config(
+  ignoresConfig,
   baseESLintConfig,
   typescriptConfig,
   eslintConfigPrettier,
@@ -201,10 +231,19 @@ const eslintConfig = typescriptEslint.config(
   jsxA11yConfig,
   unicornConfig,
   tailwindConfig,
-  eslintPluginStorybook.configs["flat/recommended"]
+  eslintPluginStorybook.configs["flat/recommended"],
+  uiOverrides,
+  storybookMainParser
 );
 
 eslintConfig.map((config) => {
+  // storybook plugin configs and global ignores scope themselves
+  if (
+    config.name?.startsWith("storybook:") ||
+    config.name === "global-ignores"
+  ) {
+    return;
+  }
   config.files = ["src/**/*.ts", "src/**/*.tsx"];
 });
 

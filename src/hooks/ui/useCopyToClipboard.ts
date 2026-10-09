@@ -16,29 +16,29 @@ export function useCopyToClipboard(timeout = 2000): UseCopyToClipboardReturn {
   const timeoutRef = useRef<number | null>(null);
 
   /** Clears the existing timeout */
-  const clearExistingTimeout = () => {
+  const clearExistingTimeout = useCallback((): void => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-  };
+  }, []);
 
   /** Reset hook state */
-  const reset = useCallback(() => {
+  const reset = useCallback((): void => {
     setStatus("idle");
     setValue("");
     clearExistingTimeout();
-  }, []);
+  }, [clearExistingTimeout]);
 
   /** Start auto-reset timer */
-  const startResetTimer = () => {
+  const startResetTimer = useCallback((): void => {
     clearExistingTimeout();
 
     timeoutRef.current = window.setTimeout(() => {
       setStatus("idle");
       timeoutRef.current = null;
     }, timeout);
-  };
+  }, [clearExistingTimeout, timeout]);
 
   /** Copy text to clipboard */
   const copy = useCallback(
@@ -80,13 +80,13 @@ export function useCopyToClipboard(timeout = 2000): UseCopyToClipboardReturn {
         return false;
       }
     },
-    [timeout]
+    [startResetTimer]
   );
 
   /** Cleanup timer on unmount */
   useEffect(() => {
     return clearExistingTimeout;
-  }, []);
+  }, [clearExistingTimeout]);
 
   return { value, status, copy, reset };
 }

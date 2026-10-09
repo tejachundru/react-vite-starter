@@ -49,31 +49,36 @@ const breakpoints: Record<BreakpointKey, number> = {
  * ```
  */
 export function useBreakpoint(breakpoint: BreakpointKey): boolean {
-  // State storing whether the breakpoint condition is satisfied
-  const [isBreakpoint, setIsBreakpoint] = useState<boolean>(false);
-
   /**
    * Checks if the current viewport width satisfies the breakpoint.
    *
+   * Used both for lazy state initialization and inside the
+   * memoized resize handler below.
+   */
+  const getIsBreakpoint = (): boolean => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth >= breakpoints[breakpoint];
+  };
+
+  // State storing whether the breakpoint condition is satisfied,
+  // initialized lazily so no effect is needed for the first render
+  const [isBreakpoint, setIsBreakpoint] =
+    useState<boolean>(getIsBreakpoint);
+
+  /**
    * Memoized with useCallback so the same function reference
    * is used for event listeners.
    */
   const checkBreakpoint = useCallback(() => {
-    const width = window.innerWidth;
-
-    // Update state if width is greater than or equal to the breakpoint
-    setIsBreakpoint(width >= breakpoints[breakpoint]);
+    setIsBreakpoint(window.innerWidth >= breakpoints[breakpoint]);
   }, [breakpoint]);
 
   useEffect(() => {
-    // Perform an initial check on mount
-    checkBreakpoint();
-
     // Listen for window resize events
     window.addEventListener("resize", checkBreakpoint);
 
     // Cleanup event listener on component unmount
-    return () => {
+    return (): void => {
       window.removeEventListener("resize", checkBreakpoint);
     };
   }, [checkBreakpoint]);
@@ -115,7 +120,7 @@ export function useActiveBreakpoint(): BreakpointKey {
    * Handles SSR environments by returning "xs"
    * when window is not available.
    */
-  const getBreakpoint = () => {
+  const getBreakpoint = (): BreakpointKey => {
     // SSR safety guard
     if (typeof window === "undefined") return "xs";
 
@@ -127,7 +132,7 @@ export function useActiveBreakpoint(): BreakpointKey {
      * breakpoint that the viewport width satisfies.
      */
     const sorted = Object.entries(breakpoints)
-      .sort((a, b) => b[1] - a[1]) as [BreakpointKey, number][];
+      .sort((a, b) => b[1] - a[1]) as Array<[BreakpointKey, number]>;
 
     // Find the first matching breakpoint
     for (const [key, minWidth] of sorted) {
@@ -154,7 +159,7 @@ export function useActiveBreakpoint(): BreakpointKey {
   const updateActiveBreakpoint = useCallback(() => {
     const next = getBreakpoint();
 
-    setActiveBreakpoint((prev) => (prev === next ? prev : next));
+    setActiveBreakpoint((previous) => (previous === next ? previous : next));
   }, []);
 
   useEffect(() => {
@@ -165,8 +170,7 @@ export function useActiveBreakpoint(): BreakpointKey {
     window.addEventListener("resize", updateActiveBreakpoint);
 
     // Cleanup listener when component unmounts
-    return () =>
-      window.removeEventListener("resize", updateActiveBreakpoint);
+    return (): void => { window.removeEventListener("resize", updateActiveBreakpoint); };
   }, [updateActiveBreakpoint]);
 
   return activeBreakpoint;

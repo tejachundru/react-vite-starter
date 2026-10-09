@@ -24,7 +24,7 @@ export function useDocumentTitle(title: string): void {
   useEffect(() => {
     document.title = title;
 
-    return () => {
+    return (): void => {
       document.title = originalTitle;
     };
   }, [title, originalTitle]);
@@ -67,14 +67,14 @@ export function useMetaTags({
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    const updateMeta = (name: string, content: string) => {
-      const attr = name.startsWith("og:") ? "property" : "name";
+    const updateMeta = (name: string, content: string): void => {
+      const attribute = name.startsWith("og:") ? "property" : "name";
 
-      let tag = document.querySelector(`meta[${attr}="${name}"]`);
+      let tag = document.querySelector(`meta[${attribute}="${name}"]`);
 
       if (!tag) {
         tag = document.createElement("meta");
-        tag.setAttribute(attr, name);
+        tag.setAttribute(attribute, name);
         document.head.appendChild(tag);
       }
 
